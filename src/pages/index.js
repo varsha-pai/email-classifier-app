@@ -1,5 +1,5 @@
 // src/pages/index.js
-import { useSession, signIn, signOut } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";import { useEffect } from "react";
 import { useState } from "react";
 import ApiKeyInput from '../components/ApiKeyInput';
 import EmailCard from '../components/EmailCard';
@@ -14,6 +14,12 @@ export default function Home() {
   const [emailCount, setEmailCount] = useState(15);
   const [isClassified, setIsClassified] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
+
+  useEffect(() => {
+    if (session?.error === "RefreshAccessTokenError") {
+      signOut(); // Force sign out if token refresh fails
+    }
+  }, [session]);
 
   const fetchEmails = async () => {
     setIsLoading(true);
@@ -38,14 +44,14 @@ export default function Home() {
     setIsLoading(true);
     setError(null);
     try {
-      const apiKey = localStorage.getItem('openai_api_key');
-      if (!apiKey) throw new Error('OpenAI API Key not found. Please save it first.');
-      const classifyRes = await fetch('/api/openai/classify', {
+      const apiKey = localStorage.getItem('huggingface_api_key');
+      if (!apiKey) throw new Error('Hugging Face API Key not found. Please save it first.');
+      const classifyRes = await fetch('/api/huggingface/classify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ emails, apiKey }),
       });
-      if (!classifyRes.ok) throw new Error('Failed to classify emails.');
+      if (!classifyRes.ok) throw new Error(`Failed to classify emails. Server responded with ${classifyRes.status}.`);
       const classifiedEmails = await classifyRes.json();
       setEmails(classifiedEmails);
       setIsClassified(true);
@@ -93,7 +99,7 @@ export default function Home() {
           <div className="text-center">
             {/* FIX: Added text-gray-900 for dark text */}
             <h1 className="text-2xl font-bold text-gray-900">Set Your API Key</h1>
-            <p className="text-gray-500 mt-2">Enter your OpenAI API key to continue. The field will be pre-filled if you have saved one before.</p>
+            <p className="text-gray-500 mt-2">Enter your Hugging Face API key to continue. The field will be pre-filled if you have saved one before.</p>
           </div>
           <ApiKeyInput />
           <div className="flex justify-end">

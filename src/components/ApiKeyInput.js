@@ -5,7 +5,7 @@ export default function ApiKeyInput() {
   const [apiKey, setApiKey] = useState('');
 
   useEffect(() => {
-    const storedKey = localStorage.getItem('openai_api_key');
+    const storedKey = localStorage.getItem('huggingface_api_key');
     if (storedKey) {
       setApiKey(storedKey);
     }
@@ -16,14 +16,14 @@ export default function ApiKeyInput() {
       alert('Please enter an API key.');
       return;
     }
-    localStorage.setItem('openai_api_key', apiKey);
+    localStorage.setItem('huggingface_api_key', apiKey);
     alert('API Key saved successfully!');
   };
 
   return (
     <div className="w-full">
       <label htmlFor="apiKey" className="block text-sm font-medium text-gray-700 mb-2">
-        OpenAI API Key
+        Hugging Face API Key
       </label>
       <div className="flex">
         <input
@@ -32,7 +32,7 @@ export default function ApiKeyInput() {
           value={apiKey}
           onChange={(e) => setApiKey(e.target.value)}
           className="flex-grow p-2 border border-gray-300 rounded-l-md"
-          placeholder="Enter your OpenAI API key"
+          placeholder="Enter your Hugging Face API key"
         />
         <button
           onClick={handleSaveKey}
